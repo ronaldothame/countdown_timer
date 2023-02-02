@@ -15,19 +15,22 @@ import java.io.File;
 
 @RestController
 @RequestMapping("countdown")
+@CrossOrigin(origins = "*")
 public class Countdown {
     @PostMapping
     public void timeInput(@RequestBody Tempo starterTime) throws IOException {
-            Long currentEvent = starterTime.eventTime();
-            BufferedWriter writer = new BufferedWriter(new FileWriter("eventFile.txt", true));
-            writer.append(currentEvent + "\n");
-            writer.close();
-        }
+        BufferedWriter writer = new BufferedWriter(new FileWriter("eventFile.txt", true));
+        writer.append(starterTime.eventName() + "|" + starterTime.eventTime() + "\n");
+        writer.close();
+    }
     @GetMapping
-    public ArrayList<Long> eventList () throws IOException {
+    public ArrayList<Tempo> eventList () throws IOException {
         Path path = Paths.get("/Users/ronaldo.thame/countdown_timer/eventFile.txt");
-        ArrayList <Long> eventTimeList = new ArrayList<>();
-        Files.readAllLines(path).forEach(item -> eventTimeList.add(Long.valueOf(item) - System.currentTimeMillis()));
+        ArrayList <Tempo> eventTimeList = new ArrayList<>();
+        Files.readAllLines(path).forEach(item -> {
+                String [] itens = item.split("\\|");
+                eventTimeList.add(new Tempo(itens[0],itens[1]));
+        });
         return eventTimeList;
     }
     @DeleteMapping
@@ -36,5 +39,5 @@ public class Countdown {
         boolean done = eventToDelete.delete();
     }
 
-    }
+}
 
