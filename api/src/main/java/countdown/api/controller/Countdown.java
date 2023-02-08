@@ -4,14 +4,11 @@ package countdown.api.controller;
 import countdown.api.Tempo;
 import org.springframework.web.bind.annotation.*;
 
-import java.io.BufferedWriter;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.io.File;
 
 @RestController
 @RequestMapping("countdown")
@@ -24,20 +21,22 @@ public class Countdown {
         writer.close();
     }
     @GetMapping
-    public ArrayList<Tempo> eventList () throws IOException {
-        Path path = Paths.get("/Users/ronaldo.thame/countdown_timer/eventFile.txt");
-        ArrayList <Tempo> eventTimeList = new ArrayList<>();
-        Files.readAllLines(path).forEach(item -> {
-                String [] itens = item.split("\\|");
-                eventTimeList.add(new Tempo(itens[0],itens[1]));
-        });
-        return eventTimeList;
+    public ArrayList<Tempo> eventList () {
+        ArrayList<Tempo> eventTimeList = new ArrayList<>();
+        try {
+            Path path = Paths.get("/Users/ronaldo.thame/countdown_timer/eventFile.txt");
+            Files.readAllLines(path).forEach(item -> {
+                String[] itens = item.split("\\|");
+                eventTimeList.add(new Tempo(itens[0], itens[1]));
+            });
+            return eventTimeList;
+        } catch (IOException ex) {
+            return eventTimeList;
+        }
     }
     @DeleteMapping
-    public void deleteEventList () {
-        File eventToDelete = new File("/Users/ronaldo.thame/countdown_timer/eventFile.txt");
-        boolean done = eventToDelete.delete();
+    public void deleteEventList () throws IOException {
+        new PrintWriter("/Users/ronaldo.thame/countdown_timer/eventFile.txt").close();
     }
-
 }
 
